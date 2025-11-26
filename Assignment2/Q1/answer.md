@@ -15,9 +15,6 @@ The dataset consists of 2000 training images (1000 cats and 1000 dogs) and 10 te
 ---
 
 ## Parameter Tuning
-
-### KNN - Finding the Best K Value
-
 I tested different values of K to find the optimal number of neighbors. The validation accuracy for each K value is shown below:
 
 | K Value | Validation Accuracy |
