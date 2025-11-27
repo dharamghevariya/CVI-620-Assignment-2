@@ -90,11 +90,3 @@ All images go through the same preprocessing pipeline: they are loaded using Ope
 | Logistic Regression | 60%           | 77.8% (7/9)              |
 
 For detailed results and analysis, see `answer.md`.
-
----
-
-**Dharam Mehulbhai Ghevariya**  
-Email: dmghevariya@myseneca.ca  
-Student ID: 136270220  
-
-CVI620 - Computer Vision | Seneca Polytechnic | Fall 2025

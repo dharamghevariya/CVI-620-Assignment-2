@@ -80,11 +80,3 @@ The preprocessing is straightforward for MNIST since the images are already clea
 | Logistic Regression | C = 1.0           | 92.61%   | Yes        |
 
 Both methods achieved the target of 90% accuracy. For detailed results and analysis, see `answer.md`.
-
----
-
-**Dharam Mehulbhai Ghevariya**  
-Email: dmghevariya@myseneca.ca  
-Student ID: 136270220  
-
-CVI620 - Computer Vision | Seneca Polytechnic | Fall 2025

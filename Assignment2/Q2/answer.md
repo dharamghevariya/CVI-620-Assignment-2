@@ -52,9 +52,48 @@ KNN performed the best with 97.05% accuracy. Looking at the results, most digits
 
 Logistic Regression achieved 92.61% accuracy, which still exceeds the 90% target. While it's simpler than KNN, it provides faster predictions since it doesn't need to compare against all training samples.
 
-## Why These Methods Work Well on MNIST
+## Testing on Internet Images
 
-MNIST is considered a relatively simple dataset for several reasons. The images are centered and normalized, the background is clean, and there's limited variation in style. This is why even basic methods like KNN can achieve excellent results. For more challenging handwriting datasets with varied styles and noise, deep learning methods like CNNs would likely be needed to maintain high accuracy.
+I downloaded 18 handwritten digit images from the internet and tested the trained models on them. The images had various styles, backgrounds, and quality levels.
+
+| Image | Actual Digit | KNN Prediction | Logistic Regression | Correct |
+|-------|--------------|----------------|---------------------|---------|
+| 0.png | 0 | 0 | 2 | KNN ✓ |
+| 2(1).jpg | 2 | 2 | 2 | Both ✓ |
+| 2.jpg | 2 | 1 | 5 | Both ✗ |
+| 3.jpeg | 3 | 3 | 3 | Both ✓ |
+| 4(2).png | 4 | 1 | 5 | Both ✗ |
+| 4(3).jpeg | 4 | 4 | 2 | KNN ✓ |
+| 5.png | 5 | 1 | 2 | Both ✗ |
+| 6(1).jpg | 6 | 3 | 5 | Both ✗ |
+| 6(2).png | 6 | 5 | 5 | Both ✗ |
+| 6(3).jpg | 6 | 4 | 8 | Both ✗ |
+| 6.jpg | 6 | 4 | 3 | Both ✗ |
+| 7(2).jpg | 7 | 7 | 7 | Both ✓ |
+| 7.jpg | 7 | 4 | 3 | Both ✗ |
+| 8(2).png | 8 | 3 | 3 | Both ✗ |
+| 8(3).png | 8 | 1 | 5 | Both ✗ |
+| 8.png | 8 | 1 | 1 | Both ✗ |
+| 9(2).png | 9 | 1 | 8 | Both ✗ |
+| 9.png | 9 | 4 | 3 | Both ✗ |
+
+**Results Summary:**
+- KNN: 5/18 correct (27.8%)
+- Logistic Regression: 4/18 correct (22.2%)
+
+## Why the Internet Images Performed Poorly
+
+The accuracy on internet images is much lower than on the MNIST test set, and there are several reasons for this.
+
+First, the MNIST dataset has a very specific style. All digits are centered, the stroke width is consistent, and the images have white digits on a pure black background. Internet images often have different backgrounds, varying stroke thicknesses, and digits that aren't perfectly centered.
+
+Second, the preprocessing might not match well. When I resize random internet images to 28x28 pixels, important details can get lost or distorted. The auto-inversion based on average brightness doesn't always work correctly for images with complex backgrounds or partial transparency.
+
+Third, handwriting styles vary widely. The MNIST dataset was collected from a specific group of people, so the models learned patterns from that particular writing style. Internet images show many different ways people write digits, and some styles look nothing like what the models trained on.
+
+Finally, image quality matters. Some internet images are low resolution, have compression artifacts, or include extra elements like grid lines or shadows that confuse the classifier.
+
+This demonstrates an important concept in machine learning called domain shift. A model can perform excellently on data similar to its training set but struggle when the input distribution changes. For better real-world performance, we would need either more diverse training data or more advanced techniques like data augmentation and deep learning.
 
 ## Saved Models
 
