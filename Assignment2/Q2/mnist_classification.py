@@ -1,11 +1,7 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import joblib
 import os
@@ -37,7 +33,6 @@ def load_data():
 
 def normalize_data(X_train, X_test):
     """Normalize pixel values to 0-1 range"""
-    # Simple normalization - divide by 255
     X_train_norm = X_train / 255.0
     X_test_norm = X_test / 255.0
     return X_train_norm, X_test_norm
@@ -103,8 +98,7 @@ def train_logistic_regression(X_train, X_test, y_train, y_test):
         print(f"\nTraining Logistic Regression with C={c}...")
         start_time = time.time()
         
-        lr = LogisticRegression(C=c, max_iter=1000, solver='lbfgs', 
-                                multi_class='multinomial', n_jobs=-1)
+        lr = LogisticRegression(C=c, max_iter=1000, solver='lbfgs', n_jobs=-1)
         lr.fit(X_train, y_train)
         
         train_time = time.time() - start_time
@@ -128,8 +122,7 @@ def train_logistic_regression(X_train, X_test, y_train, y_test):
     
     # Train final model with best C
     print(f"\nTraining final Logistic Regression model with C={best_c}...")
-    lr_best = LogisticRegression(C=best_c, max_iter=1000, solver='lbfgs',
-                                  multi_class='multinomial', n_jobs=-1)
+    lr_best = LogisticRegression(C=best_c, max_iter=1000, solver='lbfgs', n_jobs=-1)
     lr_best.fit(X_train, y_train)
     
     # Save model
@@ -137,109 +130,6 @@ def train_logistic_regression(X_train, X_test, y_train, y_test):
     print("Model saved to saved_models/logistic_regression_mnist.pkl")
     
     return lr_best, best_result['Accuracy'], results
-
-def train_svm(X_train, X_test, y_train, y_test):
-    """Train and evaluate Support Vector Machine classifier"""
-    print("\n" + "="*60)
-    print("SUPPORT VECTOR MACHINE (SVM)")
-    print("="*60)
-    
-    # Use a subset for faster training (SVM is slow on large datasets)
-    # Use 10000 samples for training
-    n_samples = min(10000, len(X_train))
-    indices = np.random.choice(len(X_train), n_samples, replace=False)
-    X_train_subset = X_train[indices]
-    y_train_subset = y_train[indices]
-    
-    print(f"Using {n_samples} samples for SVM training (full dataset is slow)")
-    
-    # Test different kernels
-    kernels = ['rbf', 'poly']
-    results = []
-    
-    for kernel in kernels:
-        print(f"\nTraining SVM with {kernel} kernel...")
-        start_time = time.time()
-        
-        svm = SVC(kernel=kernel, C=1.0, gamma='scale')
-        svm.fit(X_train_subset, y_train_subset)
-        
-        train_time = time.time() - start_time
-        
-        # Predict
-        y_pred = svm.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        
-        results.append({
-            'Kernel': kernel,
-            'Accuracy': accuracy,
-            'Time': train_time
-        })
-        print(f"{kernel}: Accuracy = {accuracy*100:.2f}%, Time = {train_time:.2f}s")
-    
-    # Find best kernel
-    best_result = max(results, key=lambda x: x['Accuracy'])
-    best_kernel = best_result['Kernel']
-    
-    print(f"\nBest kernel = {best_kernel} with accuracy = {best_result['Accuracy']*100:.2f}%")
-    
-    # Train final model with best kernel
-    print(f"\nTraining final SVM model with {best_kernel} kernel...")
-    svm_best = SVC(kernel=best_kernel, C=1.0, gamma='scale')
-    svm_best.fit(X_train_subset, y_train_subset)
-    
-    # Save model
-    joblib.dump(svm_best, 'saved_models/svm_mnist.pkl')
-    print("Model saved to saved_models/svm_mnist.pkl")
-    
-    return svm_best, best_result['Accuracy'], results
-
-def train_random_forest(X_train, X_test, y_train, y_test):
-    """Train and evaluate Random Forest classifier"""
-    print("\n" + "="*60)
-    print("RANDOM FOREST")
-    print("="*60)
-    
-    # Test different number of trees
-    n_estimators_list = [50, 100, 200]
-    results = []
-    
-    for n_est in n_estimators_list:
-        print(f"\nTraining Random Forest with {n_est} trees...")
-        start_time = time.time()
-        
-        rf = RandomForestClassifier(n_estimators=n_est, n_jobs=-1, random_state=42)
-        rf.fit(X_train, y_train)
-        
-        train_time = time.time() - start_time
-        
-        # Predict
-        y_pred = rf.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        
-        results.append({
-            'n_estimators': n_est,
-            'Accuracy': accuracy,
-            'Time': train_time
-        })
-        print(f"{n_est} trees: Accuracy = {accuracy*100:.2f}%, Time = {train_time:.2f}s")
-    
-    # Find best n_estimators
-    best_result = max(results, key=lambda x: x['Accuracy'])
-    best_n = best_result['n_estimators']
-    
-    print(f"\nBest n_estimators = {best_n} with accuracy = {best_result['Accuracy']*100:.2f}%")
-    
-    # Train final model
-    print(f"\nTraining final Random Forest model with {best_n} trees...")
-    rf_best = RandomForestClassifier(n_estimators=best_n, n_jobs=-1, random_state=42)
-    rf_best.fit(X_train, y_train)
-    
-    # Save model
-    joblib.dump(rf_best, 'saved_models/random_forest_mnist.pkl')
-    print("Model saved to saved_models/random_forest_mnist.pkl")
-    
-    return rf_best, best_result['Accuracy'], results
 
 def print_detailed_results(model, X_test, y_test, model_name):
     """Print detailed classification report and confusion matrix"""
@@ -272,18 +162,12 @@ def main():
     # Store all results
     all_results = {}
     
-    # Train all models
+    # Train models
     knn_model, knn_acc, knn_results = train_knn(X_train_norm, X_test_norm, y_train, y_test)
     all_results['KNN'] = knn_acc
     
     lr_model, lr_acc, lr_results = train_logistic_regression(X_train_norm, X_test_norm, y_train, y_test)
     all_results['Logistic Regression'] = lr_acc
-    
-    svm_model, svm_acc, svm_results = train_svm(X_train_norm, X_test_norm, y_train, y_test)
-    all_results['SVM'] = svm_acc
-    
-    rf_model, rf_acc, rf_results = train_random_forest(X_train_norm, X_test_norm, y_train, y_test)
-    all_results['Random Forest'] = rf_acc
     
     # Print summary
     print("\n" + "="*60)
@@ -311,12 +195,8 @@ def main():
     # Print detailed results for best model
     if best_method == 'KNN':
         print_detailed_results(knn_model, X_test_norm, y_test, 'KNN')
-    elif best_method == 'Logistic Regression':
-        print_detailed_results(lr_model, X_test_norm, y_test, 'Logistic Regression')
-    elif best_method == 'SVM':
-        print_detailed_results(svm_model, X_test_norm, y_test, 'SVM')
     else:
-        print_detailed_results(rf_model, X_test_norm, y_test, 'Random Forest')
+        print_detailed_results(lr_model, X_test_norm, y_test, 'Logistic Regression')
     
     print("\n" + "="*60)
     print("All models saved to 'saved_models/' directory")
